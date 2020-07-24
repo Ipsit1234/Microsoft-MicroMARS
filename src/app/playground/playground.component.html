@@ -1,0 +1,213 @@
+<div class ="wrapper">
+<div id="main-page">
+	<svg class="svg"  [attr.height]="height_svg" [attr.width]="width">
+        <rect *ngFor="let i of gridCord" [id]="i.value + ',' + i.x + ',' + i.y"  [attr.x]=i.x [attr.y]=i.y [attr.width]="30" [attr.height]="30" rx="0" ry="0" (mousedown)="mouseDownE(i.isTerrain)" (mouseup)="mouseUp()" (mouseleave)="fillGrey(i.x, i.y)"  (click)="fillColor(i.x,i.y)"> </rect>
+		<line *ngFor="let i of pathCord" [attr.x1]="i.x1" [attr.y1]="i.y1"
+		[attr.x2]="i.x2" [attr.y2]="i.y2" style="stroke:rgb(255,0,0);stroke-width:2" />
+   		
+   		<ng-container *ngIf = "selectedPS == 'TSP' && isPref  ">
+   		<text  *ngFor="let i of gridCord" [attr.x]=i.x+8 [attr.y]=i.y+15 font-size= "12"> {{i.isEndPoint}} </text>
+   		</ng-container>
+
+		<ng-container *ngIf = "selectedPS == 'TSP' && !isPref  ">
+   		<text  *ngFor="let i of gridCord" [attr.x]=i.x+8 [attr.y]=i.y+15 font-size= "12"> {{i.destOrder}} </text>
+   		</ng-container>
+
+
+	</svg>
+	<div id = "menu-bar" [style.height.px]="height_menu">
+		<!-- Choosing problem statement -->
+		<!-- <div class="ps"> -->
+		<mat-tab-group	style="color: black;"
+		[(selectedIndex)]="PS_index" (selectedIndexChange)="selectedPS = PS_index ? 'TSP':'PS_1';reset()">
+			<mat-tab *ngFor="let ps of Problem_statement">
+			  <ng-template mat-tab-label style="color: black;">{{ps.viewValue}}</ng-template>
+
+		<form>
+    	<mat-form-field appearance="fill">
+      	<mat-label><h4>Maze</h4></mat-label>
+      	<mat-select [(ngModel)]="selectedMaze" name="maze" value = "selectedMaze" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeMaze()">
+	        <mat-option *ngFor="let m of maze" [value]="m.value">
+        	    {{m.viewValue}}
+	        </mat-option>
+      	</mat-select>
+		</mat-form-field>
+
+			<section id = 'Problem_statement _2' *ngIf = "selectedPS === 'TSP'">
+				<mat-slide-toggle class="example-margin"
+						color="primary"
+						(change)="prefToggle(isPref)"
+						[checked]="false"
+						[disabled]="false"
+						[(ngModel)]="isPref"
+						[ngModelOptions]="{standalone: true}">
+						User Preference
+				</mat-slide-toggle>
+        <div *ngIf="isPref" style="text-align: center;">
+          Click on grid in preference order.
+        </div>
+     	</section>
+
+    	<mat-form-field appearance="fill" >
+        	<mat-label><h4>Algorithms</h4></mat-label>
+        	<mat-select [(ngModel)]="selectedAlgo" name="SV" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeAlgo()">
+		        <mat-option *ngFor="let algo of Algorithms" [value]="algo.value">
+	        	    {{algo.viewValue}}
+		        </mat-option>
+        	</mat-select>
+		</mat-form-field>
+
+
+			<section id = 'Heuristic' *ngIf = "(selectedAlgo == 'Astar' || selectedAlgo == 'BestFirst') && selectedPS == 'PS_1'">
+	    	<mat-form-field appearance="fill">
+	      	<mat-label><h4>Heuristic (For A* and Best-first) </h4></mat-label>
+	      	<mat-select [(ngModel)]="selectedHeuristic" name="Heuristic" value = "selectedHeuristic" [ngModelOptions]="{standalone: true}" >
+		        <mat-option *ngFor="let heu of Heuristic" [value]="heu.value">
+	        	    {{heu.viewValue}}
+		        </mat-option>
+	      	</mat-select>
+				</mat-form-field>
+			</section>
+			<div class="example-margin">
+			<mat-checkbox color="primary" [(ngModel)]="allowDiag" [ngModelOptions]="{standalone: true}" ><mat-label style="margin-right: 15px;">Allow Diagonal</mat-label></mat-checkbox>
+			<mat-checkbox color="primary" [(ngModel)]="showPath" [ngModelOptions]="{standalone: true}" (change)="checkValue(showPath?'yes':'no')" >Show Path</mat-checkbox>
+			</div>
+			<section id = 'Problem_statement 2' *ngIf = "selectedPS === 'TSP'">
+				<mat-divider></mat-divider>
+				<mat-label><h4 style="color: black;text-align: center;">Choose no of destinations</h4></mat-label>
+				<div class="example-section">
+					<mat-divider></mat-divider>
+					<mat-slider class="example-margin"
+						color="primary"
+						[max]=maxDest
+						[min]=minDest
+						[step]="step"
+						[thumbLabel]=true
+						[(ngModel)]="selectedDest"
+						(input)="onChangeDest($event)"
+						[ngModelOptions]="{standalone: true}">
+					</mat-slider>
+					<mat-form-field class="example-margin">
+						<input matInput type="number" value="{{selectedDest}}" [(ngModel)]="selectedDest" (input)="onSearchChange($event)" [ngModelOptions]="{standalone: true}" max="maxDest" min="minDestin">
+					</mat-form-field>
+				</div>
+
+			</section>
+			<mat-divider></mat-divider>
+
+
+
+			<mat-divider></mat-divider>
+			<section id = "Terrain_" *ngIf = "(selectedAlgo=='Astar' || selectedAlgo =='Dijkstra' )&& selectedPS=='PS_1'">
+				<div class="example-section">
+					<mat-divider></mat-divider>
+					<mat-slide-toggle class="example-margin"
+						color="primary"
+						[checked]="false"
+						[disabled]="false"
+						(change)="terrainToggle(isTerrain)"
+						[(ngModel)]="isTerrain"
+						[ngModelOptions]="{standalone: true}">
+						Terrain Distribution
+					</mat-slide-toggle>
+				</div>
+			</section>
+			<div class = "example-margin" *ngIf = "selectedPS == 'PS_1' && !isTerrain">
+				<mat-divider *ngIf = "selectedAlgo!='bfs'"></mat-divider>
+				<mat-checkbox color = "primary" [(ngModel)]="notCrossCorner" [ngModelOptions]="{standalone: true}">Do not cross corners</mat-checkbox>
+				<mat-checkbox color = "primary" [(ngModel)]="bidirection" [ngModelOptions]="{standalone: true}" >Bi-Directional</mat-checkbox>
+			</div>
+			<section id = "Terrain" *ngIf = "selectedAlgo!='bfs' && selectedPS=='PS_1' && isTerrain">
+			   <!-- Slider Config for terrain (not applicable incase of bfs)-->
+						<div class="example-section" >
+							<mat-slider class="example-margin"
+								color="primary"
+								[max]=max
+								[min]=min
+								[step]="step"
+								[thumbLabel]=true
+								[value]="terrainValue"
+								[(ngModel)]="terrainValue"
+								(input)="onChange($event)"
+								[ngModelOptions]="{standalone: true}">
+							</mat-slider>
+							<mat-form-field class="example-margin">
+								<input matInput type="number" value="{{terrainValue}}" [(ngModel)]="terrainValue" (input)="onSearchChange($event)" [ngModelOptions]="{standalone: true}" max="100" min="0">
+							</mat-form-field>
+						</div>
+				<mat-divider></mat-divider>
+				<div class="example-section">
+					<mat-slide-toggle class="example-margin"
+						color="primary"
+						[checked]="false"
+						[disabled]="false"
+						[(ngModel)]="isGaussian"
+						*ngIf = "isTerrain == true"
+						[ngModelOptions]="{standalone: true}">
+						Gaussian Distribution
+					</mat-slide-toggle>
+				</div>
+
+			<!--Gaussian Tabs-->
+			<div class = "gaussian">
+				<div class = "slider-labels-start" *ngIf = "isGaussian">x-axis</div>
+				<div class = "slider-labels" *ngIf = "isGaussian">{{cov_x}}</div>
+				<div class = "slider-labels-end" *ngIf = "isGaussian">y-axis</div>
+				<div class = "slider-labels" *ngIf = "isGaussian">{{cov_y}}</div>
+				<div class="gaussian-margin">
+					<mat-slider *ngIf = "isGaussian"
+						color=warn
+						[max]=20
+						[min]=7
+						[step]=0.5
+						[thumbLabel]=true
+						[value]="cov_x"
+						[(ngModel)]="cov_x"
+						[ngModelOptions]="{standalone: true}">
+					</mat-slider>
+
+					<mat-slider	*ngIf = "isGaussian"
+					color = warn
+					[max]=20
+					[min]=7
+					[step]=0.5
+					[thumbLabel]=true
+					[value]="cov_y"
+					[(ngModel)]="cov_y"
+					[ngModelOptions]="{standalone: true}">
+					</mat-slider>
+				</div>
+
+
+
+				<mat-divider></mat-divider>
+			</div>
+			<!-- Gaussian Tabs end -->
+			</section>
+		</form>
+
+		</mat-tab>
+	</mat-tab-group>
+
+	<div class = "button-cover">
+		<!-- Slider Config ends-->
+		<button mat-raised-button color="primary" class = "button" (click)="Search()" >Start Search</button>
+		<button mat-raised-button color="primary" class = "button" (click)="reset()" >Reset All</button>
+  <button mat-raised-button color="primary" class = "button" (click)="clearWall()">Clear Grid</button>
+		<button mat-raised-button color="primary" class = "button" (click)="clearPath()">Clear Path</button>
+		</div>
+
+	</div>
+	<div class= "info" cdkDragBoundary="#main-page" cdkDrag>
+		<div *ngIf = "show_infoResult">
+		<h2>Results</h2>
+		<mat-divider></mat-divider>
+		<h4> Steps : {{steps}}</h4>
+		<mat-divider></mat-divider>
+		<h4> Time : {{time}}ms</h4>
+		<mat-divider></mat-divider>
+		<h4> Length : {{lengthS}}</h4>
+		</div>
+	</div>
+</div>
+</div>

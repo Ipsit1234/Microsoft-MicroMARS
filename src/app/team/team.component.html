@@ -1,0 +1,35 @@
+<div class="wrapper">
+	<div class="note">
+		<h1>Special Thanks to our mentor, Mayank Rathore who took out time from his schedule to help and guide us through this project, 
+			held regular meetings to track the progress, as well as to help with all the doubts we had and for bonding with us.	</h1>
+	</div>
+	<mat-grid-list cols="4"  rowHeight="2:0.8" >
+		<mat-grid-tile
+		  *ngFor="let tile of tiles"
+		  [colspan]="tile.cols"
+		  [rowspan]="tile.rows"
+		  [style.background]="tile.color">
+		  <div class = "inside-tile">
+			<h4>{{tile.content}}</h4>
+		    <div class="flip-card">
+		      <div class="flip-card-inner" [ngStyle]="{'background-image': 'url(' + tile.photoId + ')'}">
+		        <div class="flip-card-front">
+		        </div>
+		        <div class="flip-card-back">
+		          <!-- <div class="social-media" > -->
+		            <ul>
+                  <li><a target="_blank" [href]="tile.email"><i
+                    class="fa fa-google fa-3x mb-3" ></i></a></li>
+                  <li><a [href]="tile.git" target="_blank"><i
+                    class="fa fa-github fa-3x mb-3" ></i></a></li>
+                  <li style="cursor: auto ;">{{tile.text}}</li>
+                	</ul>
+		          <!-- </div> -->
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</mat-grid-tile>
+	</mat-grid-list>
+
+</div>

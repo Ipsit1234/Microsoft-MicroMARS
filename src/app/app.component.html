@@ -1,19 +1,10 @@
-<!-- <nav class="navbar is-dark"> -->
-
-  <!-- logo
-  <div class="navbar-brand">
-    <a class="navbar-item">
-      <img src="assets/img/angular-logo.png">
-    </a>
-  </div>
--->
-  <!-- menu -->
+ <!-- menu -->
 <div class="navbar-menu">
-  <nav mat-tab-nav-bar style="background-color:navy" [backgroundColor]="background" animationDuration="500ms">
-    <a mat-tab-link style="color: oldlace;" *ngFor="let link of links"
-       (click)="activeLink = link.router"
-       [active]="activeLink == link.router" [routerLink] = "link.router"> {{link.view}} </a>
-    <a mat-tab-link style="position: absolute; color:white; opacity: 100%; font-size: large;vertical-align: center;text-align: right; right: 3%; border-style: hidden;">
+  <nav mat-tab-nav-bar style="background-color:navy" [backgroundColor]="background">
+    <a mat-tab-link style="color: white;" *ngFor="let link of links"
+       (click)="(link.router == activeLink)"
+       [active]="(link.router == activeLink)" [routerLink] = "link.router"> {{link.view}} </a>
+    <a mat-tab-link [disabled]="true" style="position: absolute; color:white; opacity: 100%; font-size: large;vertical-align: center;text-align: right; right: 3%; border-style: hidden;">
       Team MicroMARS 42</a>
   </nav>
 
@@ -21,13 +12,3 @@
     <router-outlet #outlet="outlet"></router-outlet>
   </div>
 </div>
-  <!-- 
-    <div class="navbar-start">
-      <a class="navbar-item" routerLink='/my-team' routerLinkActive="active-link">Contact</a>
-      <a class="navbar-item" routerLink='/home' routerLinkActive="active-link">Home</a>
-    </div>
-  </div> -->
-  <!-- The routed views render in the <router-outlet>-->
-<!-- <router-outlet></router-outlet>
-
-</nav> -->
